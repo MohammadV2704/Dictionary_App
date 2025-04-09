@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dictionary App</title>
+    <style>
+        /* --- Your Existing Styles --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .header {
+            width: 100%;
+            background-color: #008080;
+            color: white;
+            padding: 20px;
+            text-align: left;
+        }
+        .header h1 {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        .search-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+        }
+        .search-input {
+            width: 70%;
+            padding: 10px 15px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            outline: none;
+        }
+        .search-button {
+            padding: 10px 20px;
+            background-color: #008080;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .search-button:hover {
+            background-color: #006666;
+        }
+        .result-container {
+            width: 100%;
+            max-width: 800px;
+            min-height: 200px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 20px;
+            margin: 10px auto;
+        }
+        .word-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #008080;
+        }
+        .phonetic {
+            font-style: italic;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .meanings-container {
+            margin-top: 20px;
+        }
+        .part-of-speech {
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0;
+        }
+        .definition {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        .example {
+            color: #666;
+            font-style: italic;
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        .synonyms {
+            margin-top: 10px;
+        }
+        .synonym-tag {
+            display: inline-block;
+            background-color: #f0f0f0;
+            padding: 5px 10px;
+            border-radius: 15px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        footer {
+            width: 100%;
+            background-color: #008080;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            margin-top: auto;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Dictionary App</h1>
+    </div>
+    
+    <div class="search-container">
+        <input type="text" class="search-input" placeholder="Enter a word">
+        <button class="search-button">Search</button>
+    </div>
+    
+    <div class="result-container">
+        <!-- Results will appear here -->
+    </div>
+    
+    <footer>
+        © Your Dictionary App 2025
+    </footer>
+
+    <script>
+        document.querySelector('.search-button').addEventListener('click', function () {
+            const word = document.querySelector('.search-input').value.trim();
+            const resultContainer = document.querySelector('.result-container');
+
+            if (!word) {
+                resultContainer.innerHTML = `<p>Please enter a word to search.</p>`;
+                return;
+            }
+
+            const apiUrl = `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`;
+
+            fetch(apiUrl)
+                .then(res => {
+                    if (!res.ok) throw new Error('Word not found!');
+                    return res.json();
+                })
+                .then(data => {
+                    const entry = data[0];
+                    const phonetic = entry.phonetic || '';
+                    const meanings = entry.meanings.map(meaning => {
+                        const defs = meaning.definitions.map(def => `
+                            <div class="definition">• ${def.definition}</div>
+                            ${def.example ? `<div class="example">"${def.example}"</div>` : ''}
+                        `).join('');
+
+                        const synonyms = meaning.synonyms.slice(0, 5).map(syn => `<span class="synonym-tag">${syn}</span>`).join('');
+
+                        return `
+                            <div class="meanings-container">
+                                <div class="part-of-speech">${meaning.partOfSpeech}</div>
+                                ${defs}
+                                ${synonyms ? `<div class="synonyms">${synonyms}</div>` : ''}
+                            </div>
+                        `;
+                    }).join('');
+
+                    resultContainer.innerHTML = `
+                        <div class="word-title">${entry.word}</div>
+                        <div class="phonetic">${phonetic}</div>
+                        ${meanings}
+                    `;
+                })
+                .catch(err => {
+                    resultContainer.innerHTML = `<p style="color:red;">${err.message}</p>`;
+                });
+        });
+    </script>
+</body>
+</html>
