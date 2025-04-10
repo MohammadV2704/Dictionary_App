@@ -9,7 +9,6 @@ A simple and clean Dictionary App built using **HTML**, **CSS**, and **JavaScrip
 - 🧠 Displays example sentences (if available)
 - 🏷️ Lists related synonyms (up to 5)
 - ❌ Handles "Word not found" errors gracefully
-- 🎨 Responsive and user-friendly UI
 
 ---
 
